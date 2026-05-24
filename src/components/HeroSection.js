@@ -37,6 +37,8 @@ export default function HeroSection() {
   }, [])
 
   useEffect(() => {
+    if (typeof window !== 'undefined' && window.innerWidth < 768) return;
+
     const handleMouse = (e) => {
       const { innerWidth, innerHeight } = window
       const x = (e.clientX / innerWidth - 0.5) * 20
@@ -53,6 +55,8 @@ export default function HeroSection() {
   }, [])
 
   const handlePhotoMouseMove = (e) => {
+    if (typeof window !== 'undefined' && window.innerWidth < 768) return;
+    
     const rect = e.currentTarget.getBoundingClientRect()
     const relX = (e.clientX - rect.left) / rect.width
     if (relX < 0.33) setPhotoSrc('kiri')
@@ -71,7 +75,7 @@ export default function HeroSection() {
   return (
     <section
       ref={heroRef}
-      className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden px-6"
+      className="relative min-h-screen w-full max-w-[100vw] flex flex-col items-center justify-center overflow-hidden px-6"
       style={{ paddingTop: '80px' }}
     >
       <div className="absolute inset-0 pointer-events-none" style={{
@@ -112,7 +116,7 @@ export default function HeroSection() {
           </div>
 
           <div ref={subRef}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap', justifyContent: 'center' }} className="lg:justify-start">
               <span style={{ fontFamily: 'Barlow Condensed, sans-serif', fontSize: 'clamp(18px, 3vw, 28px)', fontWeight: '700', color: '#e8e0d0', letterSpacing: '0.15em' }}>
                 FULL STACK DEV
               </span>
@@ -148,7 +152,7 @@ export default function HeroSection() {
         </div>
 
         <div className="flex-shrink-0">
-          <div className="flex justify-between mb-2 px-2">
+          <div className="flex justify-between mb-2 px-2 hidden lg:flex">
             <span style={{ fontFamily: 'Space Mono, monospace', fontSize: '7px', color: 'rgba(200,169,74,0.4)', letterSpacing: '0.1em' }}>◀ LEFT</span>
             <span style={{ fontFamily: 'Space Mono, monospace', fontSize: '7px', color: 'rgba(200,169,74,0.6)', letterSpacing: '0.1em' }}>CENTER ●</span>
             <span style={{ fontFamily: 'Space Mono, monospace', fontSize: '7px', color: 'rgba(200,169,74,0.4)', letterSpacing: '0.1em' }}>RIGHT ▶</span>
@@ -210,15 +214,17 @@ export default function HeroSection() {
               }} />
             ))}
 
-            <div style={{ position: 'absolute', top: 0, left: '33.33%', width: '1px', height: '100%', background: 'rgba(200,169,74,0.08)', pointerEvents: 'none', zIndex: 2 }} />
-            <div style={{ position: 'absolute', top: 0, left: '66.66%', width: '1px', height: '100%', background: 'rgba(200,169,74,0.08)', pointerEvents: 'none', zIndex: 2 }} />
+            <div className="hidden lg:block">
+              <div style={{ position: 'absolute', top: 0, left: '33.33%', width: '1px', height: '100%', background: 'rgba(200,169,74,0.08)', pointerEvents: 'none', zIndex: 2 }} />
+              <div style={{ position: 'absolute', top: 0, left: '66.66%', width: '1px', height: '100%', background: 'rgba(200,169,74,0.08)', pointerEvents: 'none', zIndex: 2 }} />
+            </div>
           </div>
 
-          <div className="mt-2 text-center" style={{ fontFamily: 'Space Mono, monospace', fontSize: '10px', color: 'rgba(154,144,128,0.5)', letterSpacing: '0.1em' }}>
+          <div className="mt-2 text-center hidden lg:block" style={{ fontFamily: 'Space Mono, monospace', fontSize: '10px', color: 'rgba(154,144,128,0.5)', letterSpacing: '0.1em' }}>
             HOVER TO SWITCH PERSPECTIVES
           </div>
         </div>
       </div>
     </section>
   )
-}
+} 

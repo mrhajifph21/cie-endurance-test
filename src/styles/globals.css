@@ -30,11 +30,14 @@ html {
   scroll-behavior: smooth;
 }
 
-body {
+/* KUNCIAN ANTI BOCOR KE SAMPING */
+html, body {
   background-color: var(--denim-950);
   color: var(--raw-chalk);
   font-family: var(--font-body);
   overflow-x: hidden;
+  width: 100%;
+  max-width: 100vw;
   cursor: crosshair;
 }
 
@@ -237,6 +240,7 @@ body {
   0% { background-position: -200% center; }
   100% { background-position: 200% center; }
 }
+
 /* ── NEON FLICKER EFFECT ── */
 @keyframes neonFlicker {
   0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
@@ -307,4 +311,18 @@ h1 span, h2 span {
     neonFlicker 5s ease-in-out infinite,
     glitch 11s steps(1) infinite;
   animation-delay: 0.5s;
+}
+
+/* ── PERBAIKAN MOBILE KHUSUS (ANTI LAG) ── */
+@media (max-width: 768px) {
+  /* Matiin filter SVG Grain yang super berat di HP */
+  .grain-overlay::after {
+    display: none !important;
+  }
+  
+  /* Matiin animasi teks kedap-kedip di HP biar prosesor enteng */
+  h1, h2, h1 span, h2 span {
+    animation: none !important;
+    text-shadow: none !important;
+  }
 }

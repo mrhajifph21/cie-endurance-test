@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
@@ -12,6 +12,17 @@ export default function AboutSection() {
   const teethRef       = useRef(null)
   const contentRef     = useRef(null)
   const statsRef       = useRef(null)
+  
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setIsMobile(window.innerWidth < 1024)
+      const handleResize = () => setIsMobile(window.innerWidth < 1024)
+      window.addEventListener('resize', handleResize)
+      return () => window.removeEventListener('resize', handleResize)
+    }
+  }, [])
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger)
@@ -23,7 +34,6 @@ export default function AboutSection() {
       const teeth       = teethRef.current
       const content     = contentRef.current
 
-      // ── Initial state ──
       gsap.set(slider,      { top: '-140px' })
       gsap.set(leftFabric,  { x: 0 })
       gsap.set(rightFabric, { x: 0 })
@@ -45,18 +55,19 @@ export default function AboutSection() {
 
           const moveP   = Math.min(p / 0.75, 1)
           const sliderY = -140 + moveP * (vh + 80 + 140)
-          gsap.set(slider, { top: sliderY })
+          
+          if (slider) gsap.set(slider, { top: sliderY })
 
-          const openPx = moveP * (vw * 0.5)
-          gsap.set(leftFabric,  { x: -openPx })
-          gsap.set(rightFabric, { x:  openPx })
+          const openPx = moveP * (vw * (isMobile ? 0.6 : 0.5))
+          if (leftFabric) gsap.set(leftFabric,  { x: -openPx })
+          if (rightFabric) gsap.set(rightFabric, { x:  openPx })
 
           const tipY     = sliderY + 104
           const splitPct = Math.max(0, Math.min(100, (tipY / vh) * 100))
-          gsap.set(teeth, { clipPath: `inset(${splitPct}% 0 0 0)` })
+          if (teeth) gsap.set(teeth, { clipPath: `inset(${splitPct}% 0 0 0)` })
 
           const contentOpacity = Math.min(1, Math.max(0, (p - 0.08) / 0.4))
-          gsap.set(content, { opacity: contentOpacity })
+          if (content) gsap.set(content, { opacity: contentOpacity })
 
           if (p > 0.18) {
             gsap.to('.about-line', {
@@ -91,7 +102,7 @@ export default function AboutSection() {
     }, sectionRef)
 
     return () => ctx.revert()
-  }, [])
+  }, [isMobile])
 
   const skills = [
     { name: 'NEXT.JS / REACT',    level: 85, color: '#c8a94a' },
@@ -109,51 +120,49 @@ export default function AboutSection() {
       id="about"
       style={{ position: 'relative', height: '100vh', overflow: 'hidden' }}
     >
-      {/* ── CONTENT (behind fabric) ── */}
       <div
         ref={contentRef}
-        style={{
-          position: 'absolute', inset: 0, zIndex: 10,
-          paddingTop: '120px', paddingBottom: '120px', overflowY: 'auto',
-        }}
+        className="pt-20 pb-20 lg:pt-32 lg:pb-32 px-4 sm:px-6"
+        style={{ position: 'absolute', inset: 0, zIndex: 10, overflowY: 'auto' }}
       >
-        <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '0 24px' }}>
-          <div className="about-line flex items-center gap-3 mb-10">
+        <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
+          <div className="about-line flex items-center gap-3 mb-6 lg:mb-10">
             <div style={{ width: '40px', height: '1px', background: '#c8a94a', flexShrink: 0 }} />
             <span style={{ fontFamily: 'Space Mono, monospace', fontSize: '9px', color: '#c8a94a', letterSpacing: '0.25em' }}>
               ABOUT / IDENTITY
             </span>
           </div>
 
-          <div className="grid lg:grid-cols-2 gap-16 items-start">
-            <div>
+          <div className="flex flex-col lg:grid lg:grid-cols-2 gap-8 lg:gap-16 items-start">
+            <div className="w-full">
               <h2 className="about-line" style={{
                 fontFamily: 'Bebas Neue, sans-serif',
-                fontSize: 'clamp(42px, 6.5vw, 78px)', lineHeight: '0.88',
-                color: '#e8e0d0', letterSpacing: '0.04em', marginBottom: '28px',
+                fontSize: 'clamp(42px, 12vw, 78px)', lineHeight: '0.88', 
+                color: '#e8e0d0', letterSpacing: '0.04em', marginBottom: '20px',
               }}>
                 THE<br /><span style={{ color: '#c8a94a' }}>RIPPED</span><br />IDENTITY
               </h2>
               <p className="about-line" style={{
-                fontFamily: 'Barlow Condensed, sans-serif', fontSize: '19px',
-                fontWeight: '500', lineHeight: '1.65', color: 'rgba(232,224,208,0.9)',
-                letterSpacing: '0.02em', marginBottom: '18px',
+                fontFamily: 'Barlow Condensed, sans-serif', fontSize: '18px',
+                fontWeight: '500', lineHeight: '1.5', color: 'rgba(232,224,208,0.9)',
+                letterSpacing: '0.02em', marginBottom: '16px',
               }}>
                 Mahasiswa IT yang menerjemahkan baris kode menjadi pengalaman interaktif dan engaging.
               </p>
               <p className="about-line" style={{
                 fontFamily: 'Barlow Condensed, sans-serif', fontSize: '16px',
-                lineHeight: '1.7', color: 'rgba(154,144,128,0.9)',
-                letterSpacing: '0.02em', marginBottom: '28px',
+                lineHeight: '1.6', color: 'rgba(154,144,128,0.9)',
+                letterSpacing: '0.02em', marginBottom: '24px',
               }}>
                 Merancang sistem yang scalable dan aplikasi yang intuitif di jam kerja. Mengeksplorasi produksi media, visual bercerita,
                 dan setlist yang memacu adrenalin di waktu luang. Menggabungkan ketelitian seorang engineer dengan insting seorang creator.
               </p>
-              <div className="about-line" style={{ borderLeft: '3px solid #c8a94a', paddingLeft: '18px', marginBottom: '28px' }}>
+              
+              <div className="about-line" style={{ borderLeft: '3px solid #c8a94a', paddingLeft: '16px', marginBottom: '24px' }}>
                 <p style={{
-                  fontFamily: 'Barlow Condensed, sans-serif', fontSize: '21px',
+                  fontFamily: 'Barlow Condensed, sans-serif', fontSize: '20px',
                   fontWeight: '700', fontStyle: 'italic', color: '#c8a94a',
-                  letterSpacing: '0.04em', lineHeight: '1.4',
+                  letterSpacing: '0.04em', lineHeight: '1.3',
                 }}>
                   &quot;Code is the fabric,<br />creativity is the cut.&quot;
                 </p>
@@ -161,7 +170,7 @@ export default function AboutSection() {
               <div className="about-line flex flex-wrap gap-2">
                 {['CCIT FTUI','FULL STACK','NEXT.JS','CREATIVOX','DJ JAYC','BEKASI'].map(tag => (
                   <span key={tag} style={{
-                    fontFamily: 'Space Mono, monospace', fontSize: '7px',
+                    fontFamily: 'Space Mono, monospace', fontSize: '8px',
                     letterSpacing: '0.12em', color: '#9a9080',
                     border: '1px solid rgba(154,144,128,0.25)', padding: '4px 10px', borderRadius: '2px',
                   }}>{tag}</span>
@@ -169,23 +178,24 @@ export default function AboutSection() {
               </div>
             </div>
 
-            <div ref={statsRef}>
-              <div className="grid grid-cols-3 gap-3 mb-10">
+            <div ref={statsRef} className="w-full mt-4 lg:mt-0">
+              <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-8 lg:mb-10">
                 {[{label:'PROJECTS',value:12,suffix:'+'},{label:'SEMESTERS',value:4,suffix:''},{label:'GIGS',value:30,suffix:'+'}].map(stat => (
                   <div key={stat.label} style={{
                     background: 'rgba(200,169,74,0.05)', border: '1px solid rgba(200,169,74,0.18)',
-                    borderRadius: '4px', padding: '18px 10px', textAlign: 'center',
+                    borderRadius: '4px', padding: '16px 4px', textAlign: 'center',
                   }}>
                     <div className="stat-number" data-target={stat.value} data-suffix={stat.suffix}
-                      style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: '40px', color: '#c8a94a', lineHeight: '1' }}>
+                      style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: 'clamp(28px, 6vw, 40px)', color: '#c8a94a', lineHeight: '1' }}>
                       0{stat.suffix}
                     </div>
-                    <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '7px', color: '#9a9080', letterSpacing: '0.15em', marginTop: '6px' }}>
+                    <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '6px', color: '#9a9080', letterSpacing: '0.1em', marginTop: '6px' }}>
                       {stat.label}
                     </div>
                   </div>
                 ))}
               </div>
+
               <div className="flex flex-col gap-4">
                 <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '7px', color: 'rgba(200,169,74,0.5)', letterSpacing: '0.2em', marginBottom: '4px' }}>
                   TECHNICAL PROFICIENCY
@@ -205,6 +215,7 @@ export default function AboutSection() {
                   </div>
                 ))}
               </div>
+
               <div style={{ marginTop: '28px', padding: '16px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(200,169,74,0.12)', borderRadius: '4px' }}>
                 <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '7px', color: 'rgba(200,169,74,0.5)', letterSpacing: '0.18em', marginBottom: '8px' }}>EDUCATION</div>
                 <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontSize: '16px', fontWeight: '700', color: '#e8e0d0', letterSpacing: '0.05em' }}>CCIT FTUI</div>
@@ -212,142 +223,58 @@ export default function AboutSection() {
                   Computer Science & Information Technology<br />Universitas Indonesia · Semester 4
                 </div>
               </div>
+              <div className="h-20 lg:h-0"></div> 
             </div>
           </div>
         </div>
       </div>
 
-      {/* ── LEFT FABRIC ── */}
       <div ref={leftFabricRef} style={{
         position: 'absolute', top: 0, bottom: 0, left: 0, width: '50%',
         zIndex: 20, pointerEvents: 'none',
-        background: `
-          repeating-linear-gradient(-45deg, transparent, transparent 2px, rgba(255,255,255,0.022) 2px, rgba(255,255,255,0.022) 4px),
-          repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(255,255,255,0.014) 2px, rgba(255,255,255,0.014) 4px),
-          linear-gradient(180deg, #0e1522 0%, #0a1019 100%)
-        `,
+        background: `repeating-linear-gradient(-45deg, transparent, transparent 2px, rgba(255,255,255,0.022) 2px, rgba(255,255,255,0.022) 4px), repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(255,255,255,0.014) 2px, rgba(255,255,255,0.014) 4px), linear-gradient(180deg, #0e1522 0%, #0a1019 100%)`,
         boxShadow: 'inset -12px 0 30px rgba(0,0,0,0.5)',
       }} />
 
-      {/* ── RIGHT FABRIC ── */}
       <div ref={rightFabricRef} style={{
         position: 'absolute', top: 0, bottom: 0, right: 0, width: '50%',
         zIndex: 20, pointerEvents: 'none',
-        background: `
-          repeating-linear-gradient(-45deg, transparent, transparent 2px, rgba(255,255,255,0.022) 2px, rgba(255,255,255,0.022) 4px),
-          repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(255,255,255,0.014) 2px, rgba(255,255,255,0.014) 4px),
-          linear-gradient(180deg, #0e1522 0%, #0a1019 100%)
-        `,
+        background: `repeating-linear-gradient(-45deg, transparent, transparent 2px, rgba(255,255,255,0.022) 2px, rgba(255,255,255,0.022) 4px), repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(255,255,255,0.014) 2px, rgba(255,255,255,0.014) 4px), linear-gradient(180deg, #0e1522 0%, #0a1019 100%)`,
         boxShadow: 'inset 12px 0 30px rgba(0,0,0,0.5)',
       }} />
 
-      {/* ── TEETH ── */}
-      <div ref={teethRef} style={{
+      <div ref={teethRef} className="hidden lg:flex" style={{
         position: 'absolute', top: 0, bottom: 0,
         left: '50%', transform: 'translateX(-50%)',
-        width: '32px', zIndex: 25, pointerEvents: 'none',
-        display: 'flex', flexDirection: 'column',
+        width: '32px', zIndex: 25, pointerEvents: 'none', flexDirection: 'column',
       }}>
         {Array.from({ length: ROWS }).map((_, i) => (
-          <div key={i} style={{
-            flex: 1, display: 'flex', alignItems: 'center',
-            justifyContent: 'space-between', padding: '1px 0',
-          }}>
-            <div style={{
-              width: '12px', height: '9px',
-              background: i % 2 === 0
-                ? 'linear-gradient(135deg, #d4a830 0%, #9a7018 100%)'
-                : 'linear-gradient(135deg, #c09828 0%, #806010 100%)',
-              borderRadius: '2px 4px 4px 2px',
-              boxShadow: '1px 1px 3px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,220,100,0.35)',
-            }} />
-            <div style={{
-              width: '6px', height: '100%',
-              background: 'linear-gradient(180deg, #1a2030, #0d1421)',
-              borderLeft: '1px solid rgba(200,169,74,0.18)',
-              borderRight: '1px solid rgba(200,169,74,0.18)',
-            }} />
-            <div style={{
-              width: '12px', height: '9px',
-              background: i % 2 === 0
-                ? 'linear-gradient(225deg, #d4a830 0%, #9a7018 100%)'
-                : 'linear-gradient(225deg, #c09828 0%, #806010 100%)',
-              borderRadius: '4px 2px 2px 4px',
-              boxShadow: '-1px 1px 3px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,220,100,0.35)',
-            }} />
+          <div key={i} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1px 0' }}>
+            <div style={{ width: '12px', height: '9px', background: i % 2 === 0 ? 'linear-gradient(135deg, #d4a830 0%, #9a7018 100%)' : 'linear-gradient(135deg, #c09828 0%, #806010 100%)', borderRadius: '2px 4px 4px 2px', boxShadow: '1px 1px 3px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,220,100,0.35)' }} />
+            <div style={{ width: '6px', height: '100%', background: 'linear-gradient(180deg, #1a2030, #0d1421)', borderLeft: '1px solid rgba(200,169,74,0.18)', borderRight: '1px solid rgba(200,169,74,0.18)' }} />
+            <div style={{ width: '12px', height: '9px', background: i % 2 === 0 ? 'linear-gradient(225deg, #d4a830 0%, #9a7018 100%)' : 'linear-gradient(225deg, #c09828 0%, #806010 100%)', borderRadius: '4px 2px 2px 4px', boxShadow: '-1px 1px 3px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,220,100,0.35)' }} />
           </div>
         ))}
       </div>
 
-      {/* ── SEAM SHADOW ── */}
-      <div style={{
+      <div className="hidden lg:block" style={{
         position: 'absolute', top: 0, bottom: 0,
         left: 'calc(50% - 32px)', width: '64px',
         zIndex: 18, pointerEvents: 'none',
         background: 'linear-gradient(90deg, transparent, rgba(0,0,0,0.6) 38%, rgba(0,0,0,0.6) 62%, transparent)',
       }} />
 
-      {/* ── ZIPPER SLIDER ── */}
-      <div ref={sliderRef} style={{
-        position: 'absolute', left: '50%',
-        transform: 'translateX(-50%)',
-        zIndex: 35, pointerEvents: 'none',
-        display: 'flex', flexDirection: 'column', alignItems: 'center', width: '60px',
+      <div ref={sliderRef} className="hidden lg:flex" style={{
+        position: 'absolute', left: '50%', transform: 'translateX(-50%)',
+        zIndex: 35, pointerEvents: 'none', flexDirection: 'column', alignItems: 'center', width: '60px',
       }}>
-        <div style={{
-          width: '22px', height: '16px',
-          border: '3px solid #c8a030', borderBottom: 'none',
-          borderRadius: '11px 11px 0 0',
-          marginBottom: '-2px', zIndex: 1,
-          boxShadow: '0 -2px 4px rgba(0,0,0,0.5)',
-        }} />
-
-        <div style={{
-          width: '56px', height: '72px', position: 'relative',
-          background: 'linear-gradient(170deg, #f0d060 0%, #d4a830 25%, #b08020 65%, #8a6010 100%)',
-          borderRadius: '7px 7px 12px 12px',
-          boxShadow: `
-            0 6px 20px rgba(0,0,0,0.85),
-            0 2px 6px rgba(0,0,0,0.6),
-            inset 0 2px 0 rgba(255,240,160,0.55),
-            inset 0 -2px 0 rgba(0,0,0,0.35),
-            inset 3px 0 6px rgba(255,220,80,0.15),
-            inset -3px 0 6px rgba(0,0,0,0.25)
-          `,
-          border: '1px solid rgba(255,210,60,0.35)',
-        }}>
-          {[10, 22, 34, 46, 58].map(top => (
-            <div key={top} style={{
-              position: 'absolute', top, left: '7px', right: '7px', height: '2px',
-              background: 'linear-gradient(90deg, rgba(0,0,0,0.35), rgba(255,220,80,0.12), rgba(0,0,0,0.35))',
-              borderRadius: '1px',
-            }} />
-          ))}
-          <div style={{
-            position: 'absolute', top: '50%', left: '50%',
-            transform: 'translate(-50%, -50%)',
-            width: '28px', height: '18px', borderRadius: '50%',
-            background: 'radial-gradient(ellipse, #0d1421 55%, #162030 100%)',
-            border: '1.5px solid rgba(200,169,74,0.7)',
-            boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.9)',
-          }} />
-          <div style={{
-            position: 'absolute', bottom: '-16px', left: '50%',
-            transform: 'translateX(-50%)',
-            width: 0, height: 0,
-            borderLeft: '12px solid transparent',
-            borderRight: '12px solid transparent',
-            borderTop: '16px solid #8a6010',
-            filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.7))',
-          }} />
+        <div style={{ width: '22px', height: '16px', border: '3px solid #c8a030', borderBottom: 'none', borderRadius: '11px 11px 0 0', marginBottom: '-2px', zIndex: 1, boxShadow: '0 -2px 4px rgba(0,0,0,0.5)' }} />
+        <div style={{ width: '56px', height: '72px', position: 'relative', background: 'linear-gradient(170deg, #f0d060 0%, #d4a830 25%, #b08020 65%, #8a6010 100%)', borderRadius: '7px 7px 12px 12px', boxShadow: '0 6px 20px rgba(0,0,0,0.85), 0 2px 6px rgba(0,0,0,0.6), inset 0 2px 0 rgba(255,240,160,0.55), inset 0 -2px 0 rgba(0,0,0,0.35), inset 3px 0 6px rgba(255,220,80,0.15), inset -3px 0 6px rgba(0,0,0,0.25)', border: '1px solid rgba(255,210,60,0.35)' }}>
+          {[10, 22, 34, 46, 58].map(top => <div key={top} style={{ position: 'absolute', top, left: '7px', right: '7px', height: '2px', background: 'linear-gradient(90deg, rgba(0,0,0,0.35), rgba(255,220,80,0.12), rgba(0,0,0,0.35))', borderRadius: '1px' }} />)}
+          <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '28px', height: '18px', borderRadius: '50%', background: 'radial-gradient(ellipse, #0d1421 55%, #162030 100%)', border: '1.5px solid rgba(200,169,74,0.7)', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.9)' }} />
+          <div style={{ position: 'absolute', bottom: '-16px', left: '50%', transform: 'translateX(-50%)', width: 0, height: 0, borderLeft: '12px solid transparent', borderRight: '12px solid transparent', borderTop: '16px solid #8a6010', filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.7))' }} />
         </div>
-
-        <div style={{
-          marginTop: '18px', width: '32px', height: '60px',
-          background: 'linear-gradient(180deg, rgba(200,169,74,0.1) 0%, transparent 100%)',
-          borderLeft: '2px solid rgba(200,169,74,0.3)',
-          borderRight: '2px solid rgba(200,169,74,0.3)',
-        }} />
+        <div style={{ marginTop: '18px', width: '32px', height: '60px', background: 'linear-gradient(180deg, rgba(200,169,74,0.1) 0%, transparent 100%)', borderLeft: '2px solid rgba(200,169,74,0.3)', borderRight: '2px solid rgba(200,169,74,0.3)' }} />
       </div>
     </section>
   )

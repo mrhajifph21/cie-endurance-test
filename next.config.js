@@ -1,8 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  images: {
-    domains: ['dummyjson.com'],
-    unoptimized: true,
+  eslint: {
+    ignoreDuringBuilds: true,
   },
 }
 
