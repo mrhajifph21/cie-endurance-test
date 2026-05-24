@@ -10,6 +10,7 @@ export default function HeroSection() {
   const subRef = useRef(null)
   const [photoSrc, setPhotoSrc] = useState('depan')
 
+  // Entrance Animation
   useEffect(() => {
     const timer = setTimeout(() => {
       const ctx = gsap.context(() => {
@@ -36,8 +37,10 @@ export default function HeroSection() {
     return () => clearTimeout(timer)
   }, [])
 
+  // Parallax Text Animation (Cuma jalan di Laptop)
   useEffect(() => {
-    if (typeof window !== 'undefined' && window.innerWidth < 768) return;
+    // KUNCIAN: Di HP, stop fungsi parallax mouse biar gak ngelag parah
+    if (typeof window !== 'undefined' && window.innerWidth < 1024) return;
 
     const handleMouse = (e) => {
       const { innerWidth, innerHeight } = window
@@ -54,10 +57,25 @@ export default function HeroSection() {
     return () => window.removeEventListener('mousemove', handleMouse)
   }, [])
 
+  // FUNGSI 1: Hover Switch (Cuma jalan di Laptop/Tablet gede)
   const handlePhotoMouseMove = (e) => {
-    if (typeof window !== 'undefined' && window.innerWidth < 768) return;
+    // KUNCIAN: Di HP, jangan pake hover mousemove, bikin berat!
+    if (typeof window !== 'undefined' && window.innerWidth < 1024) return;
     
     const rect = e.currentTarget.getBoundingClientRect()
+    const relX = (e.clientX - rect.left) / rect.width
+    if (relX < 0.33) setPhotoSrc('kiri')
+    else if (relX > 0.67) setPhotoSrc('kanan')
+    else setPhotoSrc('depan')
+  }
+
+  // FUNGSI 2 (BARU): Tap Switch (Cuma jalan di HP)
+  const handlePhotoClick = (e) => {
+    // KUNCIAN: Di laptop, jangan pake fungsi klik ini
+    if (typeof window !== 'undefined' && window.innerWidth >= 1024) return;
+
+    const rect = e.currentTarget.getBoundingClientRect()
+    // e.clientX bisa beda antara touch sama mouse, tapi di onClick biasanya konsisten
     const relX = (e.clientX - rect.left) / rect.width
     if (relX < 0.33) setPhotoSrc('kiri')
     else if (relX > 0.67) setPhotoSrc('kanan')
@@ -97,16 +115,20 @@ export default function HeroSection() {
 
       <div className="relative z-10 flex flex-col lg:flex-row items-center gap-12 max-w-6xl w-full">
 
-        <div className="flex-1 text-center lg:text-left">
-          <div className="inline-flex items-center gap-2 mb-6">
+        {/* BUNGKUSAN TEKS RAPI DI MOBILE */}
+        <div className="flex-1 flex flex-col items-center lg:items-start w-full">
+          
+          {/* TANGGAL */}
+          <div className="flex items-center justify-center lg:justify-start gap-2 mb-6 w-full">
             <div style={{ width: '24px', height: '1px', background: '#c8a94a' }} />
-            <span style={{ fontFamily: 'Space Mono, monospace', fontSize: '9px', color: '#c8a94a', letterSpacing: '0.25em' }}>
+            <span style={{ fontFamily: 'Space Mono, monospace', fontSize: '9px', color: '#c8a94a', letterSpacing: '0.25em', textAlign: 'center' }}>
               21 MAY 2006 — BEKASI, ID
             </span>
             <div style={{ width: '24px', height: '1px', background: '#c8a94a' }} />
           </div>
 
-          <div ref={nameRef} className="mb-4">
+          {/* NAMA */}
+          <div ref={nameRef} className="mb-4 w-full text-center lg:text-left">
             <h1 style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: 'clamp(52px, 10vw, 110px)', lineHeight: '0.9', color: '#e8e0d0', letterSpacing: '0.04em' }}>
               MUHAMMAD
             </h1>
@@ -115,18 +137,19 @@ export default function HeroSection() {
             </h1>
           </div>
 
-          <div ref={subRef}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap', justifyContent: 'center' }} className="lg:justify-start">
-              <span style={{ fontFamily: 'Barlow Condensed, sans-serif', fontSize: 'clamp(18px, 3vw, 28px)', fontWeight: '700', color: '#e8e0d0', letterSpacing: '0.15em' }}>
+          {/* GELAR & TAGS */}
+          <div ref={subRef} className="w-full flex flex-col items-center lg:items-start">
+            <div className="flex items-center justify-center lg:justify-start gap-3 flex-wrap w-full">
+              <span style={{ fontFamily: 'Barlow Condensed, sans-serif', fontSize: 'clamp(18px, 3vw, 28px)', fontWeight: '700', color: '#e8e0d0', letterSpacing: '0.15em', textAlign: 'center' }}>
                 FULL STACK DEV
               </span>
               <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#b85c38' }} />
-              <span style={{ fontFamily: 'Barlow Condensed, sans-serif', fontSize: 'clamp(18px, 3vw, 28px)', fontWeight: '700', color: '#b85c38', letterSpacing: '0.15em' }}>
+              <span style={{ fontFamily: 'Barlow Condensed, sans-serif', fontSize: 'clamp(18px, 3vw, 28px)', fontWeight: '700', color: '#b85c38', letterSpacing: '0.15em', textAlign: 'center' }}>
                 CREATIVE
               </span>
             </div>
 
-            <div className="flex flex-wrap gap-2 mt-4 justify-center lg:justify-start">
+            <div className="flex flex-wrap justify-center lg:justify-start gap-2 mt-4 w-full">
               {['CCIT FTUI', 'SEMESTER AKHIR', 'R&B/HIP-HOP', 'DJ JAYC'].map(tag => (
                 <span key={tag} style={{
                   fontFamily: 'Space Mono, monospace', fontSize: '8px', letterSpacing: '0.12em',
@@ -136,7 +159,8 @@ export default function HeroSection() {
             </div>
           </div>
 
-          <div className="zipper-cta mt-10 flex items-center gap-4 justify-center lg:justify-start">
+          {/* RESLETING CTA */}
+          <div className="zipper-cta mt-10 flex items-center justify-center lg:justify-start gap-4 w-full">
             <div className="zipper-bounce">
               <svg width="32" height="40" viewBox="0 0 32 40" fill="none">
                 <rect x="8" y="0" width="16" height="10" rx="2" fill="#c8a94a" />
@@ -151,7 +175,8 @@ export default function HeroSection() {
           </div>
         </div>
 
-        <div className="flex-shrink-0">
+        {/* AREA FOTO */}
+        <div className="flex-shrink-0 mt-8 lg:mt-0 relative">
           <div className="flex justify-between mb-2 px-2 hidden lg:flex">
             <span style={{ fontFamily: 'Space Mono, monospace', fontSize: '7px', color: 'rgba(200,169,74,0.4)', letterSpacing: '0.1em' }}>◀ LEFT</span>
             <span style={{ fontFamily: 'Space Mono, monospace', fontSize: '7px', color: 'rgba(200,169,74,0.6)', letterSpacing: '0.1em' }}>CENTER ●</span>
@@ -159,10 +184,16 @@ export default function HeroSection() {
           </div>
 
           <div
+            // PERBAIKAN: Laptop pake Hover, HP pake Klik
             onMouseMove={handlePhotoMouseMove}
-            onMouseLeave={() => setPhotoSrc('depan')}
+            onClick={handlePhotoClick}
+            onMouseLeave={() => {
+              if (typeof window !== 'undefined' && window.innerWidth >= 1024) {
+                setPhotoSrc('depan')
+              }
+            }}
             style={{
-              width: 'clamp(220px, 28vw, 300px)',
+              width: 'clamp(220px, 60vw, 300px)',
               aspectRatio: '9/16',
               borderRadius: '4px',
               cursor: 'crosshair',
@@ -185,6 +216,7 @@ export default function HeroSection() {
                   src={photoFile[key]}
                   alt={photoLabel[key]}
                   fill
+                  sizes="(max-width: 768px) 60vw, 300px"
                   style={{ objectFit: 'cover', objectPosition: 'center top' }}
                   priority={key === 'depan'}
                 />
@@ -220,11 +252,13 @@ export default function HeroSection() {
             </div>
           </div>
 
-          <div className="mt-2 text-center hidden lg:block" style={{ fontFamily: 'Space Mono, monospace', fontSize: '10px', color: 'rgba(154,144,128,0.5)', letterSpacing: '0.1em' }}>
-            HOVER TO SWITCH PERSPECTIVES
+          {/* PERBAIKAN: Teks petunjuk yang responsif */}
+          <div className="mt-2 text-center" style={{ fontFamily: 'Space Mono, monospace', fontSize: '10px', color: 'rgba(154,144,128,0.5)', letterSpacing: '0.1em' }}>
+            <span className="hidden lg:block">HOVER TO SWITCH PERSPECTIVES</span>
+            <span className="block lg:hidden">TAP AREAS TO SWITCH PERSPECTIVES</span>
           </div>
         </div>
       </div>
     </section>
   )
-} 
+}
